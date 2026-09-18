@@ -19,10 +19,6 @@ Nothing else in the organisation uses this storage account.
 See its [Day 1 and Day 2 walkthrough](01bootstrap/README.md#bootstrap-day-1-and-day-2)
 for how the bootstrap process works, step by step.
 
-### `modules/bootstrap`
-
-The Terraform module `01bootstrap` calls.
-
 ## Naming convention
 
 Names in this repo (`01bootstrap/prd/env.hcl`) follow a short, fixed
