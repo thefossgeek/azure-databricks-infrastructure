@@ -16,20 +16,15 @@ The bootstrap storage account can't start in the remote backend it's meant
 to hold state for - it doesn't exist yet. So it's a two-step rollout:
 
 ```mermaid
-flowchart LR
-    subgraph Day1["Day 1 - bootstrap"]
-        A["terragrunt apply\n(local state)"] --> B["Resource group +\nstorage account +\nEntra ID group\n\npublic access open"]
+flowchart TD
+    subgraph Step1["Step 1 - Day 1: bootstrap"]
+        A["terragrunt apply\n(local state)"] --> B["Resource group +\nstorage account +\nEntra ID group\npublic access open"]
     end
 
-    subgraph Migrate["Migrate state"]
-        B --> C["Point remote_state\nat azurerm"]
-        C --> D["terragrunt init\n-migrate-state"]
-        D --> E["State now lives in\nAzure Storage"]
-    end
+    B -->|"remote_state backend -> azurerm\nterragrunt init -migrate-state"| C
 
-    subgraph Day2["Day 2 - lock down"]
-        E --> F["enable_private_endpoint\n= true, apply"]
-        F --> G["Private endpoint added,\npublic access closed"]
+    subgraph Step2["Step 2 - Day 2: lock down"]
+        C["enable_private_endpoint = true\nterragrunt apply"] --> D["Private endpoint added\npublic access closed"]
     end
 ```
 
