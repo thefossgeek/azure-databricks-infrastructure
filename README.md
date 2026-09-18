@@ -5,12 +5,23 @@ boundary that keeps data exfiltration paths closed off by default.
 
 ## Layout
 
-- [`01bootstrap/`](01bootstrap/README.md) - creates the Terraform
-  remote-state storage account and the Entra ID group used for access to
-  it. Everything else builds on top of this. See its
-  [Day 1 and Day 2 walkthrough](01bootstrap/README.md#bootstrap-day-1-and-day-2)
-  for how the bootstrap process works, step by step.
-- `modules/bootstrap/` - the Terraform module `01bootstrap` calls.
+### [`01bootstrap`](01bootstrap/README.md)
+
+One-time bootstrap of the Terraform state backend for **this repo only**.
+
+Applied once with a local state file, which is then migrated into the
+storage account it creates. After migration the local `terraform.tfstate`
+is deleted and `01bootstrap` runs against the remote backend like
+everything else.
+
+Nothing else in the organisation uses this storage account.
+
+See its [Day 1 and Day 2 walkthrough](01bootstrap/README.md#bootstrap-day-1-and-day-2)
+for how the bootstrap process works, step by step.
+
+### `modules/bootstrap`
+
+The Terraform module `01bootstrap` calls.
 
 ## Naming convention
 
