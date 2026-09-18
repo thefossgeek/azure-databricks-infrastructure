@@ -8,7 +8,7 @@ boundary that keeps data exfiltration paths closed off by default.
 - `01bootstrap/` - creates the Terraform remote-state storage account and
   the Entra ID group used for access to it. Everything else builds on top
   of this.
-- `modules/bootstrap/` — the Terraform module `01bootstrap` calls.
+- `modules/bootstrap/` - the Terraform module `01bootstrap` calls.
 
 ## Bootstrap: Day 1 and Day 2
 
@@ -16,16 +16,8 @@ The bootstrap storage account can't start in the remote backend it's meant
 to hold state for - it doesn't exist yet. So it's a two-step rollout:
 
 ```mermaid
-flowchart TD
-    subgraph Step1["Step 1 - Day 1: bootstrap"]
-        A["terragrunt apply\n(local state)"] --> B["Resource group +\nstorage account +\nEntra ID group\npublic access open"]
-    end
-
-    B -->|"remote_state backend -> azurerm\nterragrunt init -migrate-state"| C
-
-    subgraph Step2["Step 2 - Day 2: lock down"]
-        C["enable_private_endpoint = true\nterragrunt apply"] --> D["Private endpoint added\npublic access closed"]
-    end
+flowchart LR
+    A["Step 1 - Day 1\nBootstrap\n\nterragrunt apply\nLocal state, public access open"] -->|"terragrunt init\n-migrate-state"| B["Step 2 - Day 2\nLock down\n\nterragrunt apply\nPrivate endpoint, public access closed"]
 ```
 
 **Do the state migration before Day 2.** Once the private endpoint closes
