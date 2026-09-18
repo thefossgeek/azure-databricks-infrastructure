@@ -18,7 +18,8 @@ Module: [modules/bootstrap](../modules/bootstrap).
 
 One folder per environment, each fully independent: its own subscription,
 resource group, storage account, and state. To add a new environment, copy
-`prd/` to a new folder and fill in its `env.hcl`.
+`prd/` to a new folder and fill in its `env.hcl`. Never point one
+environment's `remote_state` at another's storage account.
 
 ## What it creates
 
@@ -81,7 +82,11 @@ access, only something with private network connectivity can reach the
 account - including Terraform itself. If state is still local at that
 point, you're locked out of it.
 
-1. In `<env>/terragrunt.hcl`, comment out the `local` block and uncomment
+1. Back up the local state:
+   ```bash
+   cp terraform.tfstate terraform.tfstate.backup
+   ```
+2. In `<env>/terragrunt.hcl`, comment out the `local` block and uncomment
    the `azurerm` block:
    ```hcl
    remote_state {
@@ -100,12 +105,17 @@ point, you're locked out of it.
      }
    }
    ```
-2. Run the migration and confirm **yes** when asked to copy existing state:
+3. Run the migration and confirm **yes** when asked to copy existing state:
    ```bash
    terragrunt init -migrate-state
    ```
-3. `terragrunt plan` should show `No changes.` If it doesn't, stop and
+4. `terragrunt plan` should show `No changes.` If it doesn't, stop and
    investigate before going further.
+5. Only once step 4 is clean, delete the local state files (gitignored,
+   never committed):
+   ```bash
+   rm terraform.tfstate terraform.tfstate.backup
+   ```
 
 No resources are touched by this step - only where the state lives
 changes. See `prd/terragrunt.hcl` for a working reference.
